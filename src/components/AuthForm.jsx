@@ -26,15 +26,46 @@ export default function AuthForm({ mode }) {
   const [f, setF] = useState({ name: '', email: '', password: '' })
   const [show, setShow] = useState(false), [busy, setBusy] = useState(false), [err, setErr] = useState('')
 
-  const submit = async (e) => {
-    e.preventDefault()
-    if (signup && !f.name.trim()) return setErr('Enter your full name.')
-    if (!/\S+@\S+\.\S+/.test(f.email)) return setErr('Enter a valid email address.')
-    if (f.password.length < 6) return setErr('Password needs at least 6 characters.')
-    setBusy(true)
-    await (signup ? doSignup(f) : login(f))
-    nav('/')
+  
+const submit = async (e) => {
+  e.preventDefault()
+  setErr('')
+
+  if (signup && !f.name.trim()) {
+    return setErr('Enter your full name.')
   }
+
+  if (!/\S+@\S+\.\S+/.test(f.email)) {
+    return setErr('Enter a valid email address.')
+  }
+
+  if (f.password.length < 6) {
+    return setErr('Password needs at least 6 characters.')
+  }
+
+  setBusy(true)
+
+  try {
+    if (signup) {
+      await doSignup(f)
+    } else {
+      await login(f)
+    }
+
+    nav('/')
+  } catch (error) {
+    const message = error.message || ''
+
+    if (/already exists|already registered|duplicate|email.*taken/i.test(message)) {
+      setErr('An account with this email already exists. Please log in instead.')
+    } else {
+      setErr(message || 'Something went wrong. Please try again.')
+    }
+  } finally {
+    setBusy(false)
+  }
+}
+
   const change = (e) => {
     const { name, value } = e.target
     setF((prev) => ({ ...prev, [name]: value }))

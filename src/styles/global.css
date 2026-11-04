@@ -110,9 +110,39 @@ h4 { font-weight: 700; font-size: 1rem; }
 .ring-label strong { font-size: 2.1rem; font-weight: 800; letter-spacing: -.03em; } .ring-label small { color: var(--muted); }
 .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
 .cal-dow { font-size: .74rem; color: var(--muted); font-weight: 600; padding-bottom: 6px; }
-.cal-day { position: relative; aspect-ratio: 1; display: grid; place-items: center; font-size: .86rem; border-radius: 12px; font-weight: 500; }
-.cal-day:hover { background: var(--surface-2); } .cal-day i { position: absolute; bottom: 5px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent-2); }
-.cal-day.today { background: var(--grad); color: #fff; font-weight: 700; } .cal-day.today i { background: #fff; }
+.cal-day {
+  position: relative;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  font-size: .86rem;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: default;
+}
+
+.cal-day:hover {
+  background: var(--surface-2);
+}
+
+.cal-day i {
+  position: absolute;
+  bottom: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-2);
+}
+
+.cal-day.today {
+  background: var(--grad);
+  color: #fff;
+  font-weight: 700;
+}
+
+.cal-day.today i {
+  background: #fff;
+}
 .upcoming { list-style: none; padding: 0; display: grid; gap: 14px; }
 .upcoming li { display: flex; align-items: center; gap: 12px; } .upcoming li div { display: grid; flex: 1; min-width: 0; }
 .upcoming strong { font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .upcoming small { color: var(--muted); }
@@ -237,3 +267,31 @@ h4 { font-weight: 700; font-size: 1rem; }
 .bar-col.today .bar-fill, .bar-col:hover .bar-fill { opacity: 1; }
 @media (max-width: 1180px) { .charts { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .hero-art { opacity: .25; right: -40px; } .stat { grid-template-columns: auto 1fr auto; } .stat-icon { width: 38px; height: 38px; } .bar-track { height: 110px; } }
+
+.cal-day.has-tasks::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2b1738;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-line;
+  width: max-content;
+  max-width: 220px;
+  text-align: left;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  box-shadow: 0 5px 18px rgba(0,0,0,.15);
+}
+
+.cal-day.has-tasks:hover::after {
+  opacity: 1;
+  visibility: visible;
+}

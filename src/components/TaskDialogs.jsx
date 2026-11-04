@@ -8,6 +8,42 @@ import { addDays } from '../utils/date'
 function TaskForm({ task, onClose }) {
   const { addTask, updateTask } = useTasks()
   const [f, setF] = useState(task || { title: '', description: '', category: 'Work', priority: 'Medium', dueDate: addDays(1) })
+  const [customCategories, setCustomCategories] = useState(() => {
+  try {
+    return JSON.parse(localStorage.getItem('tm-custom-categories') || '[]')
+  } catch {
+    return []
+  }
+})
+
+const [newCategory, setNewCategory] = useState('')
+const [showCustom, setShowCustom] = useState(false)
+
+const categories = [...new Set([
+  ...CATEGORIES,
+  ...customCategories,
+  f.category
+].filter(Boolean))]
+
+const addCustomCategory = () => {
+  const name = newCategory.trim()
+
+  if (!name) return
+
+  if (categories.some(c => c.toLowerCase() === name.toLowerCase())) {
+    setErr('This category already exists.')
+    return
+  }
+
+  const updated = [...customCategories, name]
+
+  localStorage.setItem('tm-custom-categories', JSON.stringify(updated))
+  setCustomCategories(updated)
+  setF(prev => ({ ...prev, category: name }))
+  setNewCategory('')
+  setShowCustom(false)
+  setErr('')
+}
   const [err, setErr] = useState(''), [busy, setBusy] = useState(false)
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
 
@@ -27,7 +63,37 @@ function TaskForm({ task, onClose }) {
         </label>
         <label className="field"><span>Description</span><textarea rows={3} value={f.description} onChange={set('description')} placeholder="Add a few details (optional)" /></label>
         <div className="grid-3">
-          <label className="field"><span>Category</span><select value={f.category} onChange={set('category')}>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></label>
+          <label className="field">
+  <span>Category</span>
+  <select
+    value={showCustom ? '__custom__' : f.category}
+    onChange={(e) => {
+      if (e.target.value === '__custom__') {
+        setShowCustom(true)
+      } else {
+        setShowCustom(false)
+        set('category')(e)
+      }
+    }}
+  >
+    {categories.map(c => <option key={c} value={c}>{c}</option>)}
+    <option value="__custom__">+ Create Custom Category</option>
+  </select>
+
+  {showCustom && (
+    <div className="custom-category">
+      <input
+        value={newCategory}
+        onChange={e => setNewCategory(e.target.value)}
+        placeholder="Enter category name"
+        autoFocus
+      />
+      <button type="button" className="btn btn-primary" onClick={addCustomCategory}>
+        Add
+      </button>
+    </div>
+  )}
+</label>
           <label className="field"><span>Priority</span><select value={f.priority} onChange={set('priority')}>{PRIORITIES.map((c) => <option key={c}>{c}</option>)}</select></label>
           <label className="field"><span>Due date</span><input type="date" value={f.dueDate} onChange={set('dueDate')} /></label>
         </div>

@@ -1,5 +1,5 @@
 import { addDays } from '../utils/date'
-export const CATEGORIES = ['Work', 'Personal', 'Design', 'Health', 'Learning']
+export const CATEGORIES = ['Work', 'Personal', 'Design', 'Health', 'Learning', 'College']
 export const PRIORITIES = ['High', 'Medium', 'Low']
 
 const t = (title, description, category, priority, off, completed = false) =>
